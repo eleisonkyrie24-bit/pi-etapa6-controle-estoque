@@ -43,3 +43,48 @@ jobs:
       - name: Executar testes JUnit e integracao
         working-directory: etapa9-build
         run: mvn --batch-mode clean test
+
+      - name: Iniciar aplicacao para teste HTTP ponta a ponta
+        working-directory: etapa9-build
+        run: |
+          nohup mvn --batch-mode spring-boot:run > /tmp/etapa9-app.log 2>&1 &
+          echo $! > /tmp/etapa9-app.pid
+          for i in {1..45}; do
+            if curl -fsS http://localhost:8080/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/etapa9-app.log
+          exit 1
+
+      - name: Testar paginas e fluxo funcional via HTTP
+        run: |
+          set -e
+          for rota in / /produtos /movimentacoes /historico; do
+            curl -fsS "http://localhost:8080${rota}" >/dev/null
+          done
+
+          test "$(curl -s -o /dev/null -w '%{http_code}' -X POST http://localhost:8080/produtos -d 'sku=e2e-001' -d 'nome=Produto E2E' -d 'preco=10.50')" = "302"
+          curl -fsS http://localhost:8080/produto/E2E-001 | grep -q 'E2E-001'
+
+          test "$(curl -s -o /dev/null -w '%{http_code}' -X POST http://localhost:8080/movimentacoes -d 'sku=E2E-001' -d 'tipo=ENTRADA' -d 'quantidade=5')" = "302"
+          test "$(curl -s -o /dev/null -w '%{http_code}' -X POST http://localhost:8080/movimentacoes -d 'sku=E2E-001' -d 'tipo=SAIDA' -d 'quantidade=2')" = "302"
+          curl -fsS http://localhost:8080/produto/E2E-001 | grep -q '>3</strong>'
+
+          test "$(curl -s -o /dev/null -w '%{http_code}' -X POST http://localhost:8080/produto/E2E-001/preco -d 'preco=12.00')" = "302"
+          curl -fsS 'http://localhost:8080/historico?sku=E2E-001' | grep -q 'E2E-001'
+          curl -fsS http://localhost:8080/api/produtos/E2E-001 | grep -q 'Produto E2E'
+
+          code=$(curl -s -o /tmp/erro.json -w '%{http_code}' -X POST http://localhost:8080/api/movimentacoes -H 'Content-Type: application/json' -d '{"sku":"E2E-001","tipo":"SAIDA","quantidade":99}')
+          test "$code" = "400"
+          grep -qi 'Estoque insuficiente' /tmp/erro.json
+
+          test "$(curl -s -o /dev/null -w '%{http_code}' -X POST http://localhost:8080/movimentacoes -d 'sku=E2E-001' -d 'tipo=SAIDA' -d 'quantidade=3')" = "302"
+          test "$(curl -s -o /dev/null -w '%{http_code}' -X POST http://localhost:8080/produto/E2E-001/excluir)" = "302"
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/api/produtos/E2E-001)" = "404"
+
+          echo 'E2E HTTP: paginas, cadastro, entrada, saida, preco, historico, API, erro e exclusao aprovados.'
+
+      - name: Encerrar aplicacao de teste
+        if: always()
+        run: |
+          if [ -f /tmp/etapa9-app.pid ]; then kill "$(cat /tmp/etapa9-app.pid)" || true; fi
