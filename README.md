@@ -60,4 +60,8 @@ A pasta `docs/versao-inicial` contém um protótipo monolítico, criado apenas c
 
 ## GitHub
 
-Após criar o repositório remoto, substitua o campo indicado no relatório pelo endereço real e insira as capturas de tela solicitadas. O arquivo `INSTRUCOES_GITHUB.md` contém os comandos.
+Repositório remoto oficial desta entrega:
+
+`https://github.com/eleisonkyrie24-bit/pi-etapa6-controle-estoque`
+
+Branch principal: `main`. O repositório foi publicado e validado por meio da integração autenticada com o GitHub.
