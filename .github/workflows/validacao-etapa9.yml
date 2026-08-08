@@ -56,33 +56,8 @@ jobs:
           cat /tmp/etapa9-app.log
           exit 1
 
-      - name: Testar paginas e fluxo funcional via HTTP
-        run: |
-          set -e
-          for rota in / /produtos /movimentacoes /historico; do
-            curl -fsS "http://localhost:8080${rota}" >/dev/null
-          done
-
-          test "$(curl -s -o /dev/null -w '%{http_code}' -X POST http://localhost:8080/produtos -d 'sku=e2e-001' -d 'nome=Produto E2E' -d 'preco=10.50')" = "302"
-          curl -fsS http://localhost:8080/produto/E2E-001 | grep -q 'E2E-001'
-
-          test "$(curl -s -o /dev/null -w '%{http_code}' -X POST http://localhost:8080/movimentacoes -d 'sku=E2E-001' -d 'tipo=ENTRADA' -d 'quantidade=5')" = "302"
-          test "$(curl -s -o /dev/null -w '%{http_code}' -X POST http://localhost:8080/movimentacoes -d 'sku=E2E-001' -d 'tipo=SAIDA' -d 'quantidade=2')" = "302"
-          curl -fsS http://localhost:8080/produto/E2E-001 | grep -q '>3</strong>'
-
-          test "$(curl -s -o /dev/null -w '%{http_code}' -X POST http://localhost:8080/produto/E2E-001/preco -d 'preco=12.00')" = "302"
-          curl -fsS 'http://localhost:8080/historico?sku=E2E-001' | grep -q 'E2E-001'
-          curl -fsS http://localhost:8080/api/produtos/E2E-001 | grep -q 'Produto E2E'
-
-          code=$(curl -s -o /tmp/erro.json -w '%{http_code}' -X POST http://localhost:8080/api/movimentacoes -H 'Content-Type: application/json' -d '{"sku":"E2E-001","tipo":"SAIDA","quantidade":99}')
-          test "$code" = "400"
-          grep -qi 'Estoque insuficiente' /tmp/erro.json
-
-          test "$(curl -s -o /dev/null -w '%{http_code}' -X POST http://localhost:8080/movimentacoes -d 'sku=E2E-001' -d 'tipo=SAIDA' -d 'quantidade=3')" = "302"
-          test "$(curl -s -o /dev/null -w '%{http_code}' -X POST http://localhost:8080/produto/E2E-001/excluir)" = "302"
-          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/api/produtos/E2E-001)" = "404"
-
-          echo 'E2E HTTP: paginas, cadastro, entrada, saida, preco, historico, API, erro e exclusao aprovados.'
+      - name: Executar roteiro completo CT01-CT28
+        run: bash validation/etapa9/e2e-http.sh
 
       - name: Encerrar aplicacao de teste
         if: always()
