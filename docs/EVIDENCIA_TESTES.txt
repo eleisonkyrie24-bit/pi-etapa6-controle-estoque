@@ -1,0 +1,12 @@
+=== TESTES FUNCIONAIS - PI ETAPA 6 ===
+[OK] SKU é normalizado
+[OK] Entrada soma ao estoque
+[OK] Saída reduz o estoque
+[OK] Movimentações ficam registradas
+[OK] Valor do estoque é calculado
+[OK] SKU duplicado é rejeitado -> Já existe produto cadastrado com o SKU TEC-001.
+[OK] Saída maior que o estoque é rejeitada -> Estoque insuficiente para a saída solicitada.
+[OK] Produto com saldo não pode ser removido -> Não é permitido remover produto com saldo em estoque.
+[OK] Produto zerado pode ser removido
+
+Todos os testes foram concluídos com sucesso.
