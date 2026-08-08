@@ -1,0 +1,47 @@
+// PROTÓTIPO INICIAL PARA DOCUMENTAÇÃO DE REFATORAÇÃO.
+// Este arquivo NÃO faz parte do build final e foi mantido apenas como evidência do "antes".
+
+import java.util.*;
+
+public class EstoqueAppMonolitico {
+    private final Map<String, Integer> estoque = new HashMap<>();
+    private final Map<String, Double> precos = new HashMap<>();
+    private final List<String> historico = new ArrayList<>();
+
+    public void executar(String opcao, String sku, String nome, double preco, int qtd) {
+        // Validação, persistência, regra de negócio e saída textual misturadas.
+        if (sku == null || sku.isBlank()) {
+            System.out.println("SKU inválido");
+            return;
+        }
+        if (opcao.equals("CADASTRAR")) {
+            if (precos.containsKey(sku)) {
+                System.out.println("Duplicado");
+                return;
+            }
+            if (nome == null || nome.isBlank() || preco <= 0) {
+                System.out.println("Dados inválidos");
+                return;
+            }
+            precos.put(sku, preco);
+            estoque.put(sku, 0);
+            System.out.println("Cadastrado");
+        } else if (opcao.equals("ENTRADA")) {
+            if (qtd <= 0) {
+                System.out.println("Quantidade inválida");
+                return;
+            }
+            estoque.put(sku, estoque.get(sku) + qtd);
+            historico.add("ENTRADA;" + sku + ";" + qtd);
+            System.out.println("Entrada realizada");
+        } else if (opcao.equals("SAIDA")) {
+            if (qtd <= 0 || qtd > estoque.get(sku)) {
+                System.out.println("Saída inválida");
+                return;
+            }
+            estoque.put(sku, estoque.get(sku) - qtd);
+            historico.add("SAIDA;" + sku + ";" + qtd);
+            System.out.println("Saída realizada");
+        }
+    }
+}
