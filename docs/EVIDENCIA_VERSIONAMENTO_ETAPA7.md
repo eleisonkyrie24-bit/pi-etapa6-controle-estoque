@@ -1,24 +1,28 @@
 # EVIDÊNCIA DE VERSIONAMENTO E EXECUÇÃO — PI ETAPA 7
 
-## Identificação
+## Repositório e integração
 
 - **Projeto:** Sistema de Controle de Estoque
 - **Repositório:** `eleisonkyrie24-bit/pi-etapa6-controle-estoque`
-- **Branch da Etapa 7:** `etapa7-junit`
-- **Branch de destino:** `main`
+- **Branch de desenvolvimento/testes:** `etapa7-junit`
+- **Branch integrada:** `main`
 - **Pull Request:** #1 — `PI Etapa 7: adiciona testes JUnit e plano de testes`
 - **URL do PR:** https://github.com/eleisonkyrie24-bit/pi-etapa6-controle-estoque/pull/1
+- **Situação final do PR:** MERGED
+- **Commit de merge:** `b6392d299d6ebff587f9d76268fd84179bdc6a4a`
+- **Data/hora do merge no GitHub:** 2026-08-08T18:00:18Z
 
 ## Commits representativos da Etapa 7
 
 | Commit | Mensagem | Evidência |
 |---|---|---|
-| `e9f7b264` | `test: configura JUnit para etapa 7` | JUnit Jupiter e Maven Surefire adicionados ao `pom.xml` |
-| `6a321351` | `test: adiciona testes unitarios de Produto` | Testes do cálculo e invariantes locais de estoque |
-| `24546bea` | `test: cobre cadastro e validacao de produto` | Testes de normalização, duplicidade e preço |
-| `098e3201` | `test: cobre movimentacoes e valor total do estoque` | Testes de entrada/saída, histórico e cálculo total |
-| `974589c7` | `ci: executa testes JUnit no GitHub Actions` | Workflow automatizado com Java 17 e Maven |
-| `b9a3c11c` | `docs: adiciona plano de testes da etapa 7` | Plano de testes versionado junto ao projeto |
+| `e9f7b264` | `test: configura JUnit para etapa 7` | JUnit Jupiter e Maven Surefire no `pom.xml` |
+| `6a321351` | `test: adiciona testes unitarios de Produto` | Cálculo e invariantes locais de estoque |
+| `24546bea` | `test: cobre cadastro e validacao de produto` | Normalização, duplicidade e preço |
+| `098e3201` | `test: cobre movimentacoes e valor total do estoque` | Entrada/saída, histórico e cálculo total |
+| `974589c7` | `ci: executa testes JUnit no GitHub Actions` | Workflow com Java 17 e Maven |
+| `b9a3c11c` | `docs: adiciona plano de testes da etapa 7` | Plano básico de testes versionado |
+| `aa7b97e1` | `docs: registra evidencia de versionamento e testes` | Evidência da Etapa 7 |
 
 ## Testes JUnit versionados
 
@@ -30,24 +34,24 @@ Foram adicionadas três classes em `src/test/java`:
 
 **Total: 9 testes JUnit.**
 
-## Evidência de execução automatizada
+## GitHub Actions — validação do HEAD final da branch
 
-Foi configurado o workflow `.github/workflows/testes-junit.yml`, executado no GitHub Actions com:
-
+- workflow: `Testes JUnit - PI Etapa 7`;
+- execução: **#6**;
+- run ID: `31270536720`;
+- commit validado: `aa7b97e12d8c187378a7368f19ca9b25b5340286`;
 - ambiente: `ubuntu-latest`;
 - Java: Temurin 17;
 - comando: `mvn --batch-mode clean test`;
-- workflow: `Testes JUnit - PI Etapa 7`;
-- execução: **#4**;
-- run ID: `31270478168`;
-- job ID: `93135420702`;
-- commit validado: `b9a3c11c82b4731f228adaf8a321800e2f943d77`;
-- resultado final: **SUCCESS**;
-- etapa `Executar testes unitários`: **SUCCESS**.
+- resultado: **SUCCESS**.
 
 URL da execução:
-https://github.com/eleisonkyrie24-bit/pi-etapa6-controle-estoque/actions/runs/31270478168
+https://github.com/eleisonkyrie24-bit/pi-etapa6-controle-estoque/actions/runs/31270536720
 
-## Conclusão da evidência
+## Validação local complementar
 
-A Etapa 7 está efetivamente versionada no mesmo repositório utilizado na Etapa 6. O histórico da branch registra separadamente configuração, testes e documentação; o Pull Request #1 permite comparar a Etapa 7 com a `main`; e o GitHub Actions comprova que o projeto de testes foi compilado e executado com sucesso em Java 17 por meio do Maven.
+O núcleo Java também foi compilado com `javac --release 17` e o método `Main` concluiu os cenários funcionais herdados da Etapa 6 sem falhas.
+
+## Conclusão
+
+O projeto de testes foi versionado no repositório da Etapa 6, validado por CI e integrado à branch `main` pelo Pull Request #1. A branch `etapa7-junit` permanece como histórico de desenvolvimento e a `main` contém a versão consolidada da Etapa 7.
