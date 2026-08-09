@@ -1,67 +1,74 @@
-# PI - Etapa 6: Sistema de Controle de Estoque
+# PI — Sistema de Controle de Estoque
 
-Projeto Java desenvolvido para a Etapa 6 do Projeto Integrador, considerando a alternativa prevista no enunciado para alunos que não realizaram as etapas anteriores.
-
-## Objetivo
-
-Demonstrar a separação entre regras de negócio e camada de apresentação, preparando o núcleo da aplicação para reutilização em uma futura aplicação web.
+Projeto Java desenvolvido no Projeto Integrador. O repositório surgiu na Etapa 6, quando o núcleo foi separado em domínio, serviços e repositórios, e foi ampliado na Etapa 7 com testes automatizados JUnit, plano de testes e evidências de execução.
 
 ## Tecnologias
 
 - Java 17
 - Maven
-- Apache NetBeans (projeto Maven reconhecido pelo IDE)
+- Apache NetBeans
+- JUnit Jupiter
+- Maven Surefire Plugin
 - Git/GitHub
+- GitHub Actions
 
-## Arquitetura
+## Estrutura
 
-- `model`: entidades e tipos do domínio.
-- `repository`: contratos de persistência.
-- `repository.memory`: implementação em memória usada nos testes.
-- `service`: regras de negócio e casos de uso.
-- `exception`: exceções de domínio.
-- `Main`: composição das dependências e testes funcionais solicitados no enunciado.
+- `src/main/java`: código de produção;
+- `src/test/java`: testes JUnit;
+- `model`: entidades e tipos do domínio;
+- `repository`: contratos de persistência;
+- `repository.memory`: implementações em memória usadas nesta etapa;
+- `service`: regras de negócio e casos de uso;
+- `exception`: exceções de domínio;
+- `docs`: arquitetura, plano de testes e evidências.
+
+A separação `src/main/java` e `src/test/java` é a estrutura Maven convencional e é reconhecida diretamente pelo Apache NetBeans, mantendo produção e testes no mesmo projeto sem misturar responsabilidades.
 
 ## Executar no NetBeans
 
 1. Abra o Apache NetBeans.
-2. Acesse **File > Open Project** e selecione esta pasta.
-3. Aguarde o carregamento do Maven.
-4. Execute `br.com.pi.estoque.Main` ou use **Run Project**.
+2. Use **File > Open Project** e selecione a pasta do repositório.
+3. Aguarde a resolução das dependências Maven.
+4. Para a aplicação, execute `br.com.pi.estoque.Main` ou **Run Project**.
+5. Para a Etapa 7, use **Test Project / Test**.
 
-## Executar por terminal
-
-Com Maven instalado:
+## Executar os testes por terminal
 
 ```bash
-mvn clean compile exec:java
+mvn clean test
 ```
 
-Também é possível compilar com `javac` usando JDK 17 ou superior.
+A suíte da Etapa 7 possui **9 testes JUnit**. A execução local registrada no NetBeans apresentou:
+
+`Tests run: 9, Failures: 0, Errors: 0, Skipped: 0` — `BUILD SUCCESS`.
 
 ## Regras implementadas
 
-- SKU obrigatório e único.
+- SKU obrigatório, normalizado e único.
 - Nome obrigatório.
 - Preço maior que zero.
-- Quantidades de entrada e saída devem ser positivas.
+- Quantidades de entrada e saída positivas.
 - Saída não pode deixar estoque negativo.
 - Produto com saldo em estoque não pode ser excluído.
 - Toda movimentação válida é registrada em histórico.
-- Valor total do estoque é calculado pela soma de `preço x quantidade`.
+- Valor total do estoque é calculado pela soma de `preço × quantidade`.
 
-## Padrão de projeto
+## Etapa 7 — documentação e evidências
 
-Foi utilizado o padrão **Repository**, isolando a regra de negócio da tecnologia de armazenamento. `ProdutoService` e `EstoqueService` dependem de interfaces, não de `HashMap`, banco de dados ou componentes Swing.
+- Plano de testes: `docs/PLANO_TESTES_ETAPA7.md`
+- Evidência de versionamento: `docs/EVIDENCIA_VERSIONAMENTO_ETAPA7.md`
+- Prints/evidências: `docs/evidencias/`
+- Workflow: `.github/workflows/testes-junit.yml`
 
-## Evidências de refatoração
+O Pull Request #1 da Etapa 7 foi integrado à branch `main` após execução bem-sucedida do workflow de testes.
 
-A pasta `docs/versao-inicial` contém um protótipo monolítico, criado apenas como baseline desta etapa. Ele demonstra os problemas que foram removidos na arquitetura final.
+## Continuidade do projeto
 
-## GitHub
+A interface Web e a persistência JDBC/JPA pertencem às etapas posteriores. Elas não são tratadas como pendências da Etapa 7; os cenários Web permanecem apenas como planejamento futuro no plano de testes.
 
-Repositório remoto oficial desta entrega:
+## Repositório
 
 `https://github.com/eleisonkyrie24-bit/pi-etapa6-controle-estoque`
 
-Branch principal: `main`. O repositório foi publicado e validado por meio da integração autenticada com o GitHub.
+Branch principal: `main`.
