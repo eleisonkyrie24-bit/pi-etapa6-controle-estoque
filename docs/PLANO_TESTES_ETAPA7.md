@@ -10,11 +10,13 @@
 
 ## 1. Objetivo
 
-Este plano define os testes básicos do Sistema de Controle de Estoque desenvolvido na Etapa 6 e preparado para futura interface web. O objetivo é verificar as principais regras de negócio, reduzir regressões durante a migração para web e registrar quais cenários devem ser executados de forma automatizada com JUnit e quais devem ser verificados manualmente na camada de apresentação.
+Este plano define os testes básicos do Sistema de Controle de Estoque desenvolvido nas etapas anteriores. O objetivo da Etapa 7 é verificar as principais regras de negócio já implementadas, reduzir regressões e registrar evidências reproduzíveis da execução dos testes e do versionamento.
 
-## 2. Escopo
+A interface Web e a persistência com JDBC/JPA pertencem às etapas posteriores do Projeto Integrador e **não são critérios de conclusão da Etapa 7**.
 
-Estão incluídos no plano:
+## 2. Escopo da Etapa 7
+
+Estão incluídos:
 
 - cadastro de produtos;
 - normalização e unicidade de SKU;
@@ -26,95 +28,102 @@ Estão incluídos no plano:
 - histórico de movimentações;
 - cálculo do valor financeiro do estoque;
 - exclusão condicionada ao saldo zero;
-- comportamento básico previsto para a futura interface web.
+- testes JUnit da camada de domínio e serviços;
+- evidências de execução no NetBeans e de versionamento no GitHub.
 
-Não fazem parte deste plano, neste momento, testes de autenticação, autorização, integração com fornecedores ou banco de dados persistente, pois essas funcionalidades ainda não pertencem ao escopo implementado.
+Não fazem parte do critério de saída desta etapa: interface HTML/CSS/JavaScript, endpoints Web/REST, autenticação, autorização, integração com fornecedores ou banco de dados persistente. Cenários para essas funcionalidades são registrados apenas na seção **Testes previstos para etapas posteriores**.
 
-## 3. Estratégia de testes
+## 3. Organização do projeto de testes no NetBeans
 
-### 3.1 Testes unitários automatizados
+Foi adotada a estrutura Maven convencional, reconhecida pelo Apache NetBeans:
 
-Os testes JUnit devem validar regras de negócio isoladas ou com dependências substituídas por implementações em memória. O projeto utiliza JUnit Jupiter e Maven Surefire. Os testes ficam em `src/test/java` e podem ser executados no NetBeans ou por `mvn test`.
+- `src/main/java`: código de produção;
+- `src/test/java`: código de testes JUnit;
+- `pom.xml`: dependências e configuração de build/teste.
 
-Classes cobertas nesta etapa:
+Essa organização mantém produção e testes separados no mesmo projeto Maven, permite execução pelo NetBeans e por `mvn clean test` e evita duplicação das classes de domínio em um projeto paralelo.
 
-- `ProdutoTest`: cálculo financeiro e invariantes locais de estoque;
-- `ProdutoServiceTest`: cadastro, normalização de SKU, duplicidade e preço;
-- `EstoqueServiceTest`: movimentações, histórico e valor total do estoque.
+## 4. Estratégia de testes
 
-### 3.2 Testes manuais
+### 4.1 Testes unitários automatizados
 
-Os testes manuais verificam fluxos completos e, posteriormente, a camada web. Na etapa web, deverão ser conferidos formulários, mensagens de validação, atualização visual dos saldos e navegação entre cadastro, listagem e histórico.
+Os testes utilizam JUnit Jupiter e Maven Surefire. Cada teste cria seus próprios objetos e, quando necessário, repositórios em memória.
 
-### 3.3 Testes de regressão
+Classes implementadas:
 
-Sempre que uma regra de produto ou estoque for alterada, todos os testes automatizados deverão ser executados novamente. Antes de uma entrega web, os cenários manuais de prioridade alta também deverão ser repetidos.
+- `ProdutoTest`: 4 testes;
+- `ProdutoServiceTest`: 3 testes;
+- `EstoqueServiceTest`: 2 testes.
 
-## 4. Ambiente de testes
+**Total automatizado: 9 testes JUnit.**
 
-- Java: JDK 17 ou superior;
+### 4.2 Testes manuais do núcleo
+
+Os testes manuais complementam a suíte automatizada nos fluxos que não foram convertidos para JUnit nesta etapa, como consulta, listagem, alteração de preço, filtragem de histórico e exclusão condicionada ao saldo.
+
+### 4.3 Regressão
+
+Sempre que uma regra de produto ou estoque for alterada, a suíte JUnit deve ser executada novamente. Uma rodada da Etapa 7 é satisfatória somente quando os testes automatizados terminam sem falhas e nenhuma regra crítica conhecida permanece quebrada.
+
+## 5. Ambiente de testes
+
+- Java: JDK 17;
 - IDE: Apache NetBeans;
 - Build: Maven;
 - Framework de teste: JUnit Jupiter 6.1.2;
-- Executor Maven: Surefire 3.5.4;
-- Persistência dos testes: repositórios em memória;
+- Maven Surefire Plugin: 3.5.4;
+- Persistência utilizada nos testes: repositórios em memória;
 - Versionamento: Git/GitHub;
-- Comando principal: `mvn clean test`.
+- Comando de execução: `mvn clean test`.
 
-## 5. Critérios de entrada
+## 6. Critérios de entrada
 
-Os testes podem começar quando:
+1. Projeto compila com Java 17.
+2. Dependências Maven são resolvidas.
+3. Classes de domínio e serviços estão disponíveis.
+4. Repositórios em memória estão funcionais.
+5. Código sob teste está versionado.
 
-1. o projeto compilar com Java 17;
-2. as dependências Maven forem resolvidas;
-3. as classes de domínio e serviços estiverem disponíveis;
-4. os repositórios em memória estiverem funcionais;
-5. o código sob teste estiver versionado.
+## 7. Critérios de saída
 
-## 6. Critérios de saída
+1. Todos os testes JUnit executam sem falhas.
+2. Nenhuma regra de prioridade Alta ou Crítica fica com defeito conhecido não tratado.
+3. Cálculos monetários permanecem exatos com `BigDecimal`.
+4. Regras de saldo, duplicidade e exclusão permanecem preservadas.
+5. Evidências da execução e do versionamento estão disponíveis.
 
-A rodada de testes é considerada satisfatória quando:
+A evidência local obtida no Apache NetBeans registrou: **Tests run: 9, Failures: 0, Errors: 0, Skipped: 0 — BUILD SUCCESS**.
 
-1. todos os testes JUnit executarem sem falhas;
-2. nenhum cenário de prioridade alta permanecer com defeito aberto;
-3. os cálculos monetários apresentarem resultado exato em `BigDecimal`;
-4. as regras de saldo, duplicidade e exclusão forem preservadas;
-5. a evidência da execução e do versionamento estiver disponível para a entrega.
-
-## 7. Casos de teste
+## 8. Casos de teste da Etapa 7
 
 | ID | Requisito | Tipo | Prioridade | Pré-condição | Passos / dados | Resultado esperado |
 |---|---|---|---|---|---|---|
 | CT01 | RF01/RN01 | Unitário/Manual | Alta | Repositório vazio | Cadastrar SKU `tec-001`, nome `Teclado`, preço `250,00` | Produto criado com SKU `TEC-001` |
-| CT02 | RF02/RN01 | Unitário/Manual | Alta | `TEC-001` já cadastrado | Tentar cadastrar `tec-001` novamente | Operação rejeitada por duplicidade |
-| CT03 | RN01 | Unitário/Manual | Alta | Nenhuma | Cadastrar SKU vazio ou somente espaços | Operação rejeitada; SKU obrigatório |
-| CT04 | RN02 | Unitário/Manual | Alta | Nenhuma | Cadastrar nome vazio | Operação rejeitada; nome obrigatório |
+| CT02 | RF02/RN01 | Unitário/Manual | Alta | `TEC-001` cadastrado | Cadastrar `tec-001` novamente | Operação rejeitada por duplicidade |
+| CT03 | RN01 | Manual | Alta | Nenhuma | Cadastrar SKU vazio ou somente espaços | Operação rejeitada; SKU obrigatório |
+| CT04 | RN02 | Manual | Alta | Nenhuma | Cadastrar nome vazio | Operação rejeitada; nome obrigatório |
 | CT05 | RF01/RN03 | Unitário/Manual | Alta | Nenhuma | Cadastrar produto com preço zero | Operação rejeitada |
-| CT06 | RF01/RN03 | Unitário/Manual | Alta | Nenhuma | Cadastrar produto com preço negativo | Operação rejeitada |
+| CT06 | RF01/RN03 | Manual | Alta | Nenhuma | Cadastrar produto com preço negativo | Operação rejeitada |
 | CT07 | RF03 | Manual | Média | Produto cadastrado | Consultar `TEC-001` | Produto correto retornado |
 | CT08 | RF03 | Manual | Média | SKU inexistente | Consultar `XXX-999` | Erro de produto não encontrado |
-| CT09 | RF04 | Manual | Média | Dois ou mais produtos cadastrados | Listar produtos | Todos os produtos aparecem |
-| CT10 | RF05 | Unitário/Manual | Média | Produto cadastrado | Alterar preço para `300,00` | Novo preço armazenado |
-| CT11 | RF05/RN03 | Unitário/Manual | Alta | Produto cadastrado | Alterar preço para zero | Operação rejeitada |
-| CT12 | RF06/RN04 | Unitário/Manual | Alta | Produto com saldo 0 | Registrar entrada de 10 | Saldo passa para 10 e movimentação é registrada |
+| CT09 | RF04 | Manual | Média | Dois ou mais produtos | Listar produtos | Todos os produtos aparecem |
+| CT10 | RF05 | Manual | Média | Produto cadastrado | Alterar preço para `300,00` | Novo preço armazenado |
+| CT11 | RF05/RN03 | Manual | Alta | Produto cadastrado | Alterar preço para zero | Operação rejeitada |
+| CT12 | RF06/RN04 | Unitário/Manual | Alta | Saldo 0 | Registrar entrada de 10 | Saldo passa para 10 e movimentação é registrada |
 | CT13 | RF06/RN04 | Unitário/Manual | Alta | Produto cadastrado | Registrar entrada 0 | Operação rejeitada |
 | CT14 | RF07/RN04 | Unitário/Manual | Alta | Saldo 10 | Registrar saída de 3 | Saldo passa para 7 e movimentação é registrada |
-| CT15 | RF07/RN04 | Unitário/Manual | Alta | Saldo 10 | Registrar saída 0 | Operação rejeitada |
+| CT15 | RF07/RN04 | Manual | Alta | Saldo 10 | Registrar saída 0 | Operação rejeitada |
 | CT16 | RF08/RN05 | Unitário/Manual | Crítica | Saldo 7 | Tentar saída de 8 ou 100 | Operação rejeitada e saldo continua 7 |
-| CT17 | RF09/RN07 | Unitário/Manual | Alta | Uma entrada e uma saída válidas | Consultar histórico | Duas movimentações exibidas |
+| CT17 | RF09/RN07 | Unitário/Manual | Alta | Entrada e saída válidas | Consultar histórico | Duas movimentações exibidas |
 | CT18 | RF09 | Manual | Média | Movimentações de SKUs distintos | Filtrar histórico por `TEC-001` | Apenas movimentações do SKU informado |
 | CT19 | RF10/RN08 | Unitário/Manual | Alta | Produto a R$ 250,00 com 7 unidades | Calcular valor em estoque | Resultado `R$ 1.750,00` |
-| CT20 | RF10/RN08 | Unitário/Manual | Alta | `TEC-001`: 7×250; `MOU-001`: 2×100 | Calcular total | Resultado `R$ 1.950,00` |
-| CT21 | RF11/RN06 | Manual | Alta | Produto com saldo maior que zero | Tentar excluir | Exclusão rejeitada |
-| CT22 | RF11/RN06 | Manual | Alta | Produto com saldo zero | Excluir produto | Produto removido com sucesso |
-| CT23 | Web planejado | Manual | Alta | Interface web disponível | Preencher formulário com dados válidos e salvar | Confirmação exibida e produto aparece na listagem |
-| CT24 | Web planejado | Manual | Alta | Interface web disponível | Enviar formulário com campos inválidos | Mensagens claras de validação; dados inválidos não persistem |
-| CT25 | Web planejado | Manual | Alta | Produto com saldo conhecido | Registrar entrada/saída pela interface | Saldo visual é atualizado e histórico reflete a operação |
-| CT26 | Web planejado | Manual | Média | Vários produtos | Navegar entre cadastro, listagem, detalhe e histórico | Navegação funciona sem perda indevida de dados |
-| CT27 | Web/API planejada | Manual/Integração | Média | Endpoint disponível | Requisitar produto existente | Resposta de sucesso com dados corretos |
-| CT28 | Web/API planejada | Manual/Integração | Alta | Endpoint disponível | Enviar operação que viola regra de negócio | Resposta de erro adequada; regra do domínio preservada |
+| CT20 | RF10/RN08 | Unitário/Manual | Alta | 7×250 e 2×100 | Calcular total | Resultado `R$ 1.950,00` |
+| CT21 | RF11/RN06 | Manual | Alta | Produto com saldo > 0 | Tentar excluir | Exclusão rejeitada |
+| CT22 | RF11/RN06 | Manual | Alta | Produto com saldo 0 | Excluir produto | Produto removido com sucesso |
 
-## 8. Rastreabilidade dos testes JUnit implementados
+**Total da Etapa 7: 22 casos planejados, dos quais 9 testes estão automatizados em JUnit.**
+
+## 9. Rastreabilidade dos testes JUnit implementados
 
 | Classe de teste | Método | Regras/Requisitos relacionados |
 |---|---|---|
@@ -128,24 +137,35 @@ A rodada de testes é considerada satisfatória quando:
 | `EstoqueServiceTest` | `deveRegistrarEntradaESaida` | RF06, RF07, RF09, RN07 |
 | `EstoqueServiceTest` | `deveCalcularValorTotalDoEstoque` | RF10, RN08 |
 
-## 9. Evidências esperadas
+## 10. Evidências
 
-Para a entrega, devem ser preservadas as seguintes evidências:
+As evidências estão versionadas em `docs/evidencias/`:
 
-- resultado dos testes no painel **Test Results** do NetBeans ou saída de `mvn clean test`;
-- arquivos de teste dentro de `src/test/java`;
-- histórico de commits da branch da Etapa 7;
-- Pull Request da Etapa 7 no repositório da etapa anterior;
-- documento de plano de testes em DOCX ou PDF;
-- arquivo compactado contendo o projeto Maven/NetBeans com os testes.
+- `01_PR_MERGE.png` — registro visual do Pull Request #1 integrado à `main`;
+- `02_COMMITS.png` — registro visual do histórico de commits da Etapa 7;
+- `03_GITHUB_ACTIONS_SUCCESS.png` — registro visual da execução automatizada concluída com sucesso;
+- `04_TESTES_NETBEANS.png` — **captura de tela real do Apache NetBeans**, mostrando `Tests run: 9, Failures: 0, Errors: 0, Skipped: 0` e `BUILD SUCCESS`.
 
-## 10. Riscos e observações
+## 11. Testes previstos para etapas posteriores — fora do critério da Etapa 7
 
-- Os repositórios em memória tornam os testes rápidos e independentes de banco, mas não substituem futuros testes de integração com JDBC/JPA.
-- Testes unitários não validam HTML, CSS, navegação ou comportamento do navegador; por isso há cenários manuais planejados para a etapa web.
-- Valores monetários devem continuar usando `BigDecimal`, evitando regressões por arredondamento binário de `double`.
-- Regras de negócio devem permanecer nos serviços e entidades; a futura camada web não deve duplicar essas validações.
+Os cenários abaixo são mantidos apenas como planejamento para a continuidade Web. Eles **não são contados como casos executados ou exigidos para concluir a Etapa 7**.
 
-## 11. Conclusão
+| ID futuro | Camada | Cenário | Resultado esperado |
+|---|---|---|---|
+| FW01 | Web | Enviar formulário de cadastro válido | Confirmação exibida e produto listado |
+| FW02 | Web | Enviar formulário com dados inválidos | Validação clara e dados não persistidos |
+| FW03 | Web | Registrar entrada/saída pela interface | Saldo e histórico atualizados |
+| FW04 | Web | Navegar entre cadastro, listagem, detalhe e histórico | Navegação consistente |
+| FW05 | Web/REST | Consultar produto existente por endpoint | Resposta de sucesso com dados corretos |
+| FW06 | Web/REST | Enviar operação que viola regra de negócio | Resposta de erro e regra do domínio preservada |
 
-O plano cobre as regras já implementadas e cria uma base de regressão para a futura aplicação web. A Etapa 7 adiciona testes JUnit reais ao núcleo reutilizável criado na Etapa 6, preservando a separação de responsabilidades e permitindo que mudanças futuras na interface ou persistência sejam verificadas sem reescrever as regras centrais.
+## 12. Riscos e observações
+
+- Repositórios em memória tornam a suíte independente de banco; testes de integração JDBC/JPA serão necessários quando a persistência for implementada.
+- Testes JUnit desta etapa validam domínio e serviços, não HTML, CSS ou navegador.
+- Valores monetários devem continuar usando `BigDecimal`.
+- Regras de negócio devem permanecer no domínio/serviços para serem reutilizadas nas etapas posteriores.
+
+## 13. Conclusão
+
+A Etapa 7 possui uma suíte JUnit executável no Apache NetBeans e no Maven, com nove testes automatizados aprovados, plano de testes do núcleo, evidência local de `BUILD SUCCESS` e histórico de versionamento no GitHub. Os cenários Web foram separados do escopo atual para evitar que funcionalidades ainda pertencentes às etapas posteriores sejam interpretadas como pendências desta entrega.
